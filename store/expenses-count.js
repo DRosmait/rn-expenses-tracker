@@ -34,7 +34,7 @@ function expensesReducer(expenses, { type, payload }) {
       const id = new Date().toString() + Math.random().toString();
       return [{ ...payload, id }, ...expenses];
     case "DELETE":
-      return expenses.filter((expense) => expense.id === payload.id);
+      return expenses.filter((expense) => expense.id !== payload.id);
     case "UPDATE":
       return expenses.map((expense) =>
         expense.id === payload.id

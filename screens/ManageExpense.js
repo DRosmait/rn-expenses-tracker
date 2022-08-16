@@ -1,5 +1,5 @@
-import { useContext, useLayoutEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { useLayoutEffect, useState } from "react";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import Button from "../components/UI/Button";
 import IconButton from "../components/UI/IconButton";
 import { GlobalStyles } from "../constansts/styles";
@@ -10,10 +10,10 @@ function ManageExpenses({ navigation, route }) {
   const editedExpenseId = route.params?.itemId;
   const editedExpense = expenses.find(({ id }) => id === editedExpenseId);
   const [description, setDescription] = useState(
-    editedExpense.description ?? ""
+    editedExpense?.description ?? ""
   );
-  const [amount, setAmount] = useState(editedExpense.amount ?? 0);
-  const [date, setDate] = useState(editedExpense.date ?? new Date());
+  const [amount, setAmount] = useState(editedExpense?.amount.toFixed(2) ?? "");
+  const [date, setDate] = useState(editedExpense?.date ?? new Date());
   const isEditing = !!editedExpense;
 
   useLayoutEffect(() => {
@@ -23,7 +23,7 @@ function ManageExpenses({ navigation, route }) {
   }, [navigation, isEditing]);
 
   function deleteExpenseHandler() {
-    deleteExpense({ id: editedExpense });
+    deleteExpense({ id: editedExpenseId });
     cancelHandler();
   }
 
@@ -32,7 +32,19 @@ function ManageExpenses({ navigation, route }) {
   }
 
   function confirmHandler() {
-    isEditing ? updateExpense({ id: editedExpense }) : cancelHandler();
+    isEditing
+      ? updateExpense({
+          ...editedExpense,
+          description,
+          amount: +parseFloat(amount).toFixed(2),
+          date: new Date(),
+        })
+      : addExpense({
+          description,
+          amount: +parseFloat(amount).toFixed(2),
+          date: new Date(),
+        });
+    cancelHandler();
   }
 
   return (
@@ -42,8 +54,28 @@ function ManageExpenses({ navigation, route }) {
           Cancel
         </Button>
         <Button onPress={confirmHandler} style={styles.button}>
-          {isEditing ? "Update" : "Edit"}
+          {isEditing ? "Update" : "Create"}
         </Button>
+      </View>
+
+      <View>
+        <View>
+          <Text style={styles.inputLabel}>Description:</Text>
+          <TextInput
+            style={styles.input}
+            value={description}
+            onChangeText={setDescription}
+          />
+        </View>
+        <View>
+          <Text style={styles.inputLabel}>Amount:</Text>
+          <TextInput
+            style={styles.input}
+            value={amount}
+            onChangeText={setAmount}
+            keyboardType="numeric"
+          />
+        </View>
       </View>
 
       {isEditing && (
@@ -83,5 +115,15 @@ const styles = StyleSheet.create({
   button: {
     minWidth: 120,
     marginHorizontal: 8,
+  },
+  inputLabel: {
+    fontSize: 16,
+    color: GlobalStyles.colors.primary100,
+  },
+  input: {
+    backgroundColor: "white",
+    marginVertical: 8,
+    padding: 8,
+    color: GlobalStyles.colors.primary800,
   },
 });

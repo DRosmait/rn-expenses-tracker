@@ -1,10 +1,10 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import ExpensesSummary from "./ExpensesSummary";
 import ExpensesList from "./ExpensesList";
 import { GlobalStyles } from "../../constansts/styles";
 import { useNavigation } from "@react-navigation/native";
 
-function ExpensesOutput({ expenses, periodName }) {
+function ExpensesOutput({ expenses, periodName, fallbackText }) {
   const { navigate } = useNavigation();
 
   function expenseItemPressHandler(itemId) {
@@ -14,7 +14,13 @@ function ExpensesOutput({ expenses, periodName }) {
   return (
     <View style={styles.container}>
       <ExpensesSummary expenses={expenses} periodName={periodName} />
-      <ExpensesList expenses={expenses} onPressed={expenseItemPressHandler} />
+      {expenses.length ? (
+        <ExpensesList expenses={expenses} onPressed={expenseItemPressHandler} />
+      ) : (
+        <View style={styles.infoContainer}>
+          <Text style={styles.infoText}>{fallbackText}</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -28,5 +34,14 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
     backgroundColor: GlobalStyles.colors.primary700,
     flex: 1,
+  },
+  infoContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  infoText: {
+    color: GlobalStyles.colors.primary100,
+    fontSize: 16,
   },
 });
