@@ -1,5 +1,6 @@
 import { useLayoutEffect, useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import ExpensesForm from "../components/ManageExpense/ExpenseForm";
 import Button from "../components/UI/Button";
 import IconButton from "../components/UI/IconButton";
 import { GlobalStyles } from "../constansts/styles";
@@ -49,6 +50,8 @@ function ManageExpenses({ navigation, route }) {
 
   return (
     <View style={styles.container}>
+      <ExpensesForm />
+
       <View style={styles.buttons}>
         <Button mode="flat" onPress={cancelHandler} style={styles.button}>
           Cancel
@@ -56,26 +59,6 @@ function ManageExpenses({ navigation, route }) {
         <Button onPress={confirmHandler} style={styles.button}>
           {isEditing ? "Update" : "Create"}
         </Button>
-      </View>
-
-      <View>
-        <View>
-          <Text style={styles.inputLabel}>Description:</Text>
-          <TextInput
-            style={styles.input}
-            value={description}
-            onChangeText={setDescription}
-          />
-        </View>
-        <View>
-          <Text style={styles.inputLabel}>Amount:</Text>
-          <TextInput
-            style={styles.input}
-            value={amount}
-            onChangeText={setAmount}
-            keyboardType="numeric"
-          />
-        </View>
       </View>
 
       {isEditing && (
@@ -115,15 +98,5 @@ const styles = StyleSheet.create({
   button: {
     minWidth: 120,
     marginHorizontal: 8,
-  },
-  inputLabel: {
-    fontSize: 16,
-    color: GlobalStyles.colors.primary100,
-  },
-  input: {
-    backgroundColor: "white",
-    marginVertical: 8,
-    padding: 8,
-    color: GlobalStyles.colors.primary800,
   },
 });
