@@ -4,10 +4,10 @@ import ExpensesForm from "../components/ManageExpense/ExpenseForm";
 import IconButton from "../components/UI/IconButton";
 import { GlobalStyles } from "../constansts/styles";
 import { useExpenses } from "../store/expenses-count";
-import { storeExpense } from "../utils/http";
+import { deleteExpense, storeExpense, updateExpense } from "../utils/http";
 
 function ManageExpenses({ navigation, route }) {
-  const { addExpense, deleteExpense, updateExpense } = useExpenses();
+  const ctx = useExpenses();
   const editedExpenseId = route.params?.itemId;
   const { expenses } = useExpenses();
   const editedExpense = expenses.find(({ id }) => id === editedExpenseId);
@@ -20,7 +20,8 @@ function ManageExpenses({ navigation, route }) {
   }, [navigation, isEditing]);
 
   function deleteExpenseHandler() {
-    deleteExpense({ id: editedExpenseId });
+    ctx.deleteExpense({ id: editedExpenseId });
+    deleteExpense(editedExpenseId);
     cancelHandler();
   }
 
@@ -28,17 +29,18 @@ function ManageExpenses({ navigation, route }) {
     navigation.goBack();
   }
 
-  async function confirmHandler(expense) {
+  async function confirmHandler(expenseData) {
     if (isEditing) {
-      updateExpense({
+      ctx.updateExpense({
         id: editedExpenseId,
-        ...expense,
+        ...expenseData,
       });
+      updateExpense(editedExpenseId, expenseData);
     } else {
-      const id = await storeExpense(expense);
-      addExpense({
+      const id = await storeExpense(expenseData);
+      ctx.addExpense({
         id,
-        ...expense,
+        ...expenseData,
       });
     }
 
