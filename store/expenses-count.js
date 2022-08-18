@@ -1,29 +1,9 @@
 import { createContext, useCallback, useContext, useReducer } from "react";
 
-export const DUMMY_EXPENSES = [
-  {
-    id: "e1",
-    description: "A pair of shoes",
-    amount: 59.99,
-    date: new Date("2022-01-25"),
-  },
-  {
-    id: "e2",
-    description: "A pair of trousers",
-    amount: 89.4,
-    date: new Date("2022-02-01"),
-  },
-  {
-    id: "e3",
-    description: "A banch of bananas",
-    amount: 59.99,
-    date: new Date("2022-02-19"),
-  },
-];
-
 const ExpensesContext = createContext({
   expenses: [],
   addExpense: ({ description, amount, date }) => {},
+  setExpenses: (expenses) => {},
   deleteExpense: (id) => {},
   updateExpense: (id, { description, amount, date }) => {},
 });
@@ -31,8 +11,9 @@ const ExpensesContext = createContext({
 function expensesReducer(expenses, { type, payload }) {
   switch (type) {
     case "ADD":
-      const id = new Date().toString() + Math.random().toString();
-      return [{ ...payload, id }, ...expenses];
+      return [{ ...payload }, ...expenses];
+    case "SET":
+      return [...payload.reverse()];
     case "DELETE":
       return expenses.filter((expense) => expense.id !== payload.id);
     case "UPDATE":
@@ -50,10 +31,14 @@ function expensesReducer(expenses, { type, payload }) {
 }
 
 function ExpensesContextProvider({ children }) {
-  const [expenses, dispatch] = useReducer(expensesReducer, DUMMY_EXPENSES);
+  const [expenses, dispatch] = useReducer(expensesReducer, []);
 
   const addExpense = useCallback(
     (payload) => dispatch({ type: "ADD", payload }),
+    [dispatch]
+  );
+  const setExpenses = useCallback(
+    (payload) => dispatch({ type: "SET", payload }),
     [dispatch]
   );
   const deleteExpense = useCallback(
@@ -68,6 +53,7 @@ function ExpensesContextProvider({ children }) {
   const value = {
     expenses,
     addExpense,
+    setExpenses,
     deleteExpense,
     updateExpense,
   };
